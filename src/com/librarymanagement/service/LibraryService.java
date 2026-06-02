@@ -8,6 +8,7 @@ import com.librarymanagement.model.IssueRecord;
 import com.librarymanagement.model.Member;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 public class LibraryService {
@@ -109,8 +110,16 @@ public class LibraryService {
     }
 
     public void returnBook(int issueId) throws SQLException {
-        boolean returned = issueDAO.returnBook(issueId);
-        System.out.println(returned ? "Book returned successfully." : "Active issue record not found.");
+        int result = issueDAO.returnBook(issueId);
+
+        if (result == -1) {
+            System.out.println("Active issue record not found.");
+        } else if (result == 0) {
+            System.out.println("Book returned successfully. No fine.");
+        } else {
+            System.out.println("Book returned successfully.");
+            System.out.println("Overdue Fine: Rs." + result);
+        }
     }
 
     public void viewIssuedBooks() throws SQLException {
@@ -121,16 +130,22 @@ public class LibraryService {
             return;
         }
 
-        System.out.printf("%-8s %-8s %-10s %-15s %-10s%n", "IssueID", "BookID", "MemberID", "IssueDate", "Status");
-        System.out.println("------------------------------------------------------------");
+        System.out.printf("%-8s %-8s %-10s %-13s %-13s %-10s%n",
+                "IssueID", "BookID", "MemberID", "IssueDate", "DueDate", "Status");
+        System.out.println("------------------------------------------------------------------------");
 
+        LocalDate today = LocalDate.now();
         for (IssueRecord record : records) {
-            System.out.printf("%-8d %-8d %-10d %-15s %-10s%n",
+            boolean overdue = record.getDueDate() != null && today.isAfter(record.getDueDate());
+            String status = overdue ? "OVERDUE !!" : record.getStatus();
+
+            System.out.printf("%-8d %-8d %-10d %-13s %-13s %-10s%n",
                     record.getIssueId(),
                     record.getBookId(),
                     record.getMemberId(),
                     record.getIssueDate(),
-                    record.getStatus());
+                    record.getDueDate(),
+                    status);
         }
     }
 
