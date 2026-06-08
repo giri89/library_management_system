@@ -23,12 +23,24 @@ public class LibraryService {
     }
 
     public void addBook(String title, String author, String category, int totalCopies) throws SQLException {
+        if (title == null || title.trim().isEmpty()) {
+            System.out.println("Title cannot be empty.");
+            return;
+        }
+        if (author == null || author.trim().isEmpty()) {
+            System.out.println("Author cannot be empty.");
+            return;
+        }
+        if (category == null || category.trim().isEmpty()) {
+            System.out.println("Category cannot be empty.");
+            return;
+        }
         if (totalCopies <= 0) {
             System.out.println("Total copies must be greater than zero.");
             return;
         }
 
-        boolean added = bookDAO.addBook(new Book(title, author, category, totalCopies));
+        boolean added = bookDAO.addBook(new Book(title.trim(), author.trim(), category.trim(), totalCopies));
         System.out.println(added ? "Book added successfully." : "Book could not be added.");
     }
 
@@ -44,7 +56,12 @@ public class LibraryService {
     }
 
     public void searchBooks(String keyword) throws SQLException {
-        List<Book> books = bookDAO.searchBooks(keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("Search keyword cannot be empty.");
+            return;
+        }
+
+        List<Book> books = bookDAO.searchBooks(keyword.trim());
 
         if (books.isEmpty()) {
             System.out.println("No matching books found.");
@@ -55,8 +72,16 @@ public class LibraryService {
     }
 
     public void updateBookCopies(int bookId, int totalCopies, int availableCopies) throws SQLException {
-        if (availableCopies < 0 || totalCopies < availableCopies) {
-            System.out.println("Invalid copy count.");
+        if (totalCopies <= 0) {
+            System.out.println("Total copies must be greater than zero.");
+            return;
+        }
+        if (availableCopies < 0) {
+            System.out.println("Available copies cannot be negative.");
+            return;
+        }
+        if (totalCopies < availableCopies) {
+            System.out.println("Available copies cannot be more than total copies.");
             return;
         }
 
@@ -70,7 +95,28 @@ public class LibraryService {
     }
 
     public void addMember(String name, String email, String phone) throws SQLException {
-        boolean added = memberDAO.addMember(new Member(name, email, phone));
+        if (name == null || name.trim().isEmpty()) {
+            System.out.println("Name cannot be empty.");
+            return;
+        }
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("Email cannot be empty.");
+            return;
+        }
+        if (!email.trim().contains("@") || !email.trim().contains(".")) {
+            System.out.println("Invalid email format.");
+            return;
+        }
+        if (phone == null || phone.trim().isEmpty()) {
+            System.out.println("Phone cannot be empty.");
+            return;
+        }
+        if (!phone.trim().matches("\\d{10}")) {
+            System.out.println("Phone must be exactly 10 digits.");
+            return;
+        }
+
+        boolean added = memberDAO.addMember(new Member(name.trim(), email.trim(), phone.trim()));
         System.out.println(added ? "Member registered successfully." : "Member could not be registered.");
     }
 
@@ -82,16 +128,23 @@ public class LibraryService {
             return;
         }
 
-        System.out.printf("%-5s %-25s %-30s %-15s%n", "ID", "Name", "Email", "Phone");
-        System.out.println("----------------------------------------------------------------------------");
+        printMembers(members);
+    }
 
-        for (Member member : members) {
-            System.out.printf("%-5d %-25s %-30s %-15s%n",
-                    member.getMemberId(),
-                    member.getName(),
-                    member.getEmail(),
-                    member.getPhone());
+    public void searchMembers(String keyword) throws SQLException {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("Search keyword cannot be empty.");
+            return;
         }
+
+        List<Member> members = memberDAO.searchMembers(keyword.trim());
+
+        if (members.isEmpty()) {
+            System.out.println("No matching members found.");
+            return;
+        }
+
+        printMembers(members);
     }
 
     public void issueBook(int bookId, int memberId) throws SQLException {
@@ -162,6 +215,19 @@ public class LibraryService {
                     book.getCategory(),
                     book.getTotalCopies(),
                     book.getAvailableCopies());
+        }
+    }
+
+    private void printMembers(List<Member> members) {
+        System.out.printf("%-5s %-25s %-30s %-15s%n", "ID", "Name", "Email", "Phone");
+        System.out.println("----------------------------------------------------------------------------");
+
+        for (Member member : members) {
+            System.out.printf("%-5d %-25s %-30s %-15s%n",
+                    member.getMemberId(),
+                    member.getName(),
+                    member.getEmail(),
+                    member.getPhone());
         }
     }
 }
