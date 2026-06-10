@@ -138,4 +138,17 @@ public class IssueDAO {
                 resultSet.getString("status")
         );
     }
+    public boolean hasActiveIssues(int bookId) throws SQLException {
+        String sql = "SELECT 1 FROM issue_records WHERE book_id = ? AND status = 'ISSUED'";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, bookId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
 }
