@@ -90,6 +90,11 @@ public class LibraryService {
     }
 
     public void deleteBook(int bookId) throws SQLException {
+        if (issueDAO.hasActiveIssues(bookId)) {
+            System.out.println("Cannot delete. This book is currently issued to a member.");
+            return;
+        }
+
         boolean deleted = bookDAO.deleteBook(bookId);
         System.out.println(deleted ? "Book deleted successfully." : "Book not found.");
     }
