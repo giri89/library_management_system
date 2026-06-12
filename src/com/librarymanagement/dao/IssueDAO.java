@@ -151,4 +151,19 @@ public class IssueDAO {
             }
         }
     }
+    public List<IssueRecord> getAllIssueRecords() throws SQLException {
+        List<IssueRecord> records = new ArrayList<>();
+        String sql = "SELECT * FROM issue_records ORDER BY issue_id";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                records.add(mapIssueRecord(resultSet));
+            }
+        }
+
+        return records;
+    }
 }
