@@ -235,4 +235,36 @@ public class LibraryService {
                     member.getPhone());
         }
     }
+    
+    public void viewAllHistory() throws SQLException {
+        List<IssueRecord> records = issueDAO.getAllIssueRecords();
+
+        if (records.isEmpty()) {
+            System.out.println("No issue history found.");
+            return;
+        }
+
+        System.out.printf("%-8s %-8s %-10s %-13s %-13s %-13s %-10s%n",
+                "IssueID", "BookID", "MemberID", "IssueDate", "DueDate", "ReturnDate", "Status");
+        System.out.println("--------------------------------------------------------------------------------------");
+
+        LocalDate today = LocalDate.now();
+        for (IssueRecord record : records) {
+            String status = record.getStatus();
+            if ("ISSUED".equals(status) && record.getDueDate() != null && today.isAfter(record.getDueDate())) {
+                status = "OVERDUE !!";
+            }
+
+            String returnDate = record.getReturnDate() == null ? "-" : record.getReturnDate().toString();
+
+            System.out.printf("%-8d %-8d %-10d %-13s %-13s %-13s %-10s%n",
+                    record.getIssueId(),
+                    record.getBookId(),
+                    record.getMemberId(),
+                    record.getIssueDate(),
+                    record.getDueDate(),
+                    returnDate,
+                    status);
+        }
+    }
 }
