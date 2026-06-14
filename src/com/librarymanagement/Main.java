@@ -31,6 +31,7 @@ public class Main {
                     case 9: issueBook(); break;
                     case 10: returnBook(); break;
                     case 11: libraryService.viewIssuedBooks(); break;
+                    case 12: libraryService.viewAllHistory(); break;
                     case 0:
                         System.out.println("Goodbye!");
                         return;
@@ -60,6 +61,7 @@ public class Main {
         System.out.println(" 9.  Issue Book");
         System.out.println(" 10. Return Book");
         System.out.println(" 11. View Issued Books");
+        System.out.println(" 12. View All History");
         System.out.println(" 0.  Exit");
         System.out.println("----------------------------------------");
     }
